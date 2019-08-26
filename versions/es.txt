@@ -1,0 +1,13 @@
+{
+  "name" : "node1",
+  "cluster_name" : "es.ycsb.cluster",
+  "cluster_uuid" : "XX1JghoRTBy8hmGQujESsg",
+  "version" : {
+    "number" : "5.5.1",
+    "build_hash" : "19c13d0",
+    "build_date" : "2017-07-18T20:44:24.823Z",
+    "build_snapshot" : false,
+    "lucene_version" : "6.6.0"
+  },
+  "tagline" : "You Know, for Search"
+}

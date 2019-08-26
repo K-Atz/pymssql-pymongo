@@ -10,7 +10,7 @@ es = Elasticsearch('172.16.13.26')
 conn = pymssql.connect(server='172.16.8.10\RICESTSQLSERVER', user='sa', password='RICEST@SQLSERVER2008', database='NOSQL_db')  
 cursor = conn.cursor()
 
-cursor.execute('SELECT ID, DocID, Abstract FROM [NOSQL_db].[dbo].[LangFilter]')
+cursor.execute('SELECT TOP(10) ID, DocID, Abstract FROM [NOSQL_db].[dbo].[LangFilter]')
 
 sum = 0
 

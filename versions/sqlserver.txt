@@ -1,0 +1,4 @@
+Microsoft SQL Server 2019 (CTP3.2) - 15.0.1800.32 (X64) 
+        Jul 17 2019 21:29:33 
+        Copyright (C) 2019 Microsoft Corporation
+        Developer Edition (64-bit) on Linux (CentOS Linux 7 (Core)) <X64> 
