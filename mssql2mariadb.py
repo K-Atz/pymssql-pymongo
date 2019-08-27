@@ -22,3 +22,4 @@ for item in cursor:
         bulk+=1
         mysql_connection.commit()
         print("Bulk Count: %d" % bulk)
+
