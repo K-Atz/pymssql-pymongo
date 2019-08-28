@@ -9,7 +9,7 @@ from utils import *
 # word7 = 'value'
 
 words = [randomword(3), randomword(4), randomword(5)]
-dbs = [ELASTIC, MSSQL, MYSQL, MONGODB]
+dbs = [ELASTIC, ELASTIC5, MSSQL, MYSQL, MONGODB]
 ops = [SINGLE, AND, OR]
 
 for op in ops:
@@ -17,7 +17,7 @@ for op in ops:
     for db in dbs:
         r = search_words(db, op, words)
         s = ''
-        if db == MSSQL:
+        if db == MSSQL or db == ELASTIC5:
             s = '\t'
         else:
             s = '\t\t'

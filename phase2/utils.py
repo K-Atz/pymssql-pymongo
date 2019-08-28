@@ -2,6 +2,7 @@ import pymssql, pymongo, random, copy, time, mysql.connector, datetime
 from nltk.corpus import stopwords 
 from nltk.tokenize import word_tokenize 
 from elasticsearch import Elasticsearch
+from elasticsearch5 import Elasticsearch as Elasticsearch5
 
 #--------------------------------------------------------------------------------------------#
 
@@ -23,6 +24,7 @@ MSSQL = 'sql server'
 MYSQL = 'mysql'
 MONGODB = 'mongodb'
 ELASTIC = 'elastic'
+ELASTIC5 = 'elastic5'
 
 def search_words(db, optype, words):
     if db == MSSQL:
@@ -33,6 +35,8 @@ def search_words(db, optype, words):
         return mongo_search(optype, words)
     if db == ELASTIC:
         return elastic_search(optype, words)
+    if db == ELASTIC5:
+        return elastic5_search(optype, words)
 
 #--------------------------------------------------------------------------------------------#
 
@@ -192,3 +196,49 @@ def mongo_search(optype, words):
         result = mycol.count({"$text": {"$search": ("%s" % term)}})
         end = datetime.datetime.now()
     return (result, end-start)
+
+def elastic5_search(optype, words): #fieldname = 'abstract'
+    es = Elasticsearch5(HOSTIP + ':9205')
+    body = {}
+    if optype == SINGLE:
+        body = {
+            "size": MAX,
+            "query" : {
+                "match" : {
+                    COLUMN : words[0]
+                }
+            }
+        }
+    else:
+        search_words = []
+        for w in words:
+            search_words += [
+                {
+                    "match" : {
+                        COLUMN : w
+                    }
+                }
+            ]
+        if optype == AND:
+            body = {
+                "size": MAX,
+                "query" : {
+                    "bool" : {
+                        "must" : search_words
+                    }
+                }
+            }
+        elif optype == OR:
+            body = {
+                "size": MAX,
+                "query" : {
+                    "bool" : {
+                        "should" : search_words
+                    }
+                }
+            }
+    start = datetime.datetime.now()
+    result = es.search(index=DB, doc_type=TABLE, body=body)
+    end = datetime.datetime.now()
+    total_hits = result['hits']['total']
+    return (total_hits, end-start)
