@@ -3,7 +3,7 @@ import pymssql
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 
-BULK_SIZE = 10000
+BULK_SIZE = 50000
 
 es = Elasticsearch('172.16.13.26')
 
