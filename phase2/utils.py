@@ -26,22 +26,21 @@ MONGODB = 'mongodb'
 ELASTIC = 'elastic'
 ELASTIC5 = 'elastic5'
 
-def search_words(db, optype, words):
+def search_words(db, optype, words, connection):
     if db == MSSQL:
-        return search_mssql(optype, words)
+        return search_mssql(optype, words, connection)
     if db == MYSQL:
-        return search_mysql(optype, words)
+        return search_mysql(optype, words, connection)
     if db == MONGODB:
-        return mongo_search(optype, words)
+        return mongo_search(optype, words, connection)
     if db == ELASTIC:
-        return elastic_search(optype, words)
+        return elastic_search(optype, words, connection)
     if db == ELASTIC5:
-        return elastic5_search(optype, words)
+        return elastic5_search(optype, words, connection)
 
 #--------------------------------------------------------------------------------------------#
 
-def search_mysql(optype, words):
-    mysql_connection = mysql.connector.connect(host='localhost', user="root", passwd="password", db=DB)
+def search_mysql(optype, words, mysql_connection):
     mysql_cursor = mysql_connection.cursor()
     start = None
     end = None
@@ -73,8 +72,7 @@ def search_mysql(optype, words):
 
 #--------------------------------------------------------------------------------------------#
 
-def search_mssql(optype, words):
-    mssql_conn = pymssql.connect(server=HOSTIP, user='sa', password='MSSql-pwd', database=DB)  
+def search_mssql(optype, words, mssql_conn):  
     mssql_cursor = mssql_conn.cursor()
     cmd = 'SELECT COUNT(*) as total_hits FROM %s WHERE ' % TABLE
     if optype == SINGLE:
@@ -116,8 +114,7 @@ def randomword(n):
 
 #--------------------------------------------------------------------------------------------#
 
-def elastic_search(optype, words): #fieldname = 'abstract'
-    es = Elasticsearch(HOSTIP)
+def elastic_search(optype, words, es): #fieldname = 'abstract'
     body = {}
     if optype == SINGLE:
         body = {
@@ -167,8 +164,7 @@ def elastic_search(optype, words): #fieldname = 'abstract'
     end = datetime.datetime.now()
     return (total_hits, end-start)
 
-def mongo_search(optype, words):
-    client = pymongo.MongoClient('mongodb://%s:27023/' % HOSTIP)
+def mongo_search(optype, words, client):
     mydb = client[DB]
     mycol = mydb[TABLE]
     start = None
@@ -197,8 +193,7 @@ def mongo_search(optype, words):
         end = datetime.datetime.now()
     return (result, end-start)
 
-def elastic5_search(optype, words): #fieldname = 'abstract'
-    es = Elasticsearch5(HOSTIP + ':9205')
+def elastic5_search(optype, words, es): #fieldname = 'abstract'
     body = {}
     if optype == SINGLE:
         body = {

@@ -8,20 +8,29 @@ from utils import *
 # word6 = 'computinh'
 # word7 = 'value'
 
+mysql_connection = mysql.connector.connect(host='localhost', user="root", passwd="password", db=DB)
+mssql_conn = pymssql.connect(server=HOSTIP, user='sa', password='MSSql-pwd', database=DB)
+es = Elasticsearch(HOSTIP)
+client = pymongo.MongoClient('mongodb://%s:27023/' % HOSTIP)
+es5 = Elasticsearch5(HOSTIP + ':9205')
+
 words = [randomword(3), randomword(4), randomword(5)]
-dbs = [ELASTIC, ELASTIC5, MSSQL, MYSQL, MONGODB]
+# dbs = [(ELASTIC, es), (ELASTIC5, es5), (MSSQL, mssql_conn), (MYSQL, mysql_connection), (MONGODB, client)]
+dbs = [(MSSQL, mssql_conn), (MYSQL, mysql_connection), (MONGODB, client)]
 ops = [SINGLE, AND, OR]
+
+print('words: ', words)
 
 for op in ops:
     print(op)
     for db in dbs:
-        r = search_words(db, op, words)
+        r = search_words(db[0], op, words, db[1])
         s = ''
-        if db == MSSQL or db == ELASTIC5:
+        if db[0] == MSSQL or db[0] == ELASTIC5:
             s = '\t'
         else:
             s = '\t\t'
-        print ("%s%s%s\t%s" %(db, s, r[0], r[1]))
+        print ("%s%s%s\t%s" %(db[0], s, r[0], r[1]))
     print("\n")
     words = [randomword(3), randomword(4), randomword(5)]
 
