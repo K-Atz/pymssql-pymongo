@@ -29,6 +29,15 @@ def runworkload_mongo(optype, ref, es):
     mean = sum(times)/len(times)
     return mean*1000
 
-print(runworkload_es5(AND, "randomwordstemp.txt", es))
-# print(runworkload_mongo(AND, "randomwordstemp.txt", client))
+SRC = "randomwordstemp.txt"
+
+# print("es mean for AND: ", runworkload_es5(AND, SRC, es))
+# print("es mean for OR: ", runworkload_es5(OR, SRC, es))
+# print("es mean for SINGLE: ", runworkload_es5(SINGLE, SRC, es))
+
+print("mongo mean for AND: ", runworkload_mongo(AND, SRC, client))
+print("mongo mean for OR: ", runworkload_mongo(OR, SRC, client))
+print("mongo mean for SINGLE: ", runworkload_mongo(SINGLE, SRC, client))
+
+# print(runworkload_mongo(AND, SRC, client))
 
