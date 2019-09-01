@@ -14,7 +14,8 @@ es = Elasticsearch(HOSTIP)
 client = pymongo.MongoClient('mongodb://%s:27023/' % HOSTIP)
 es5 = Elasticsearch5(HOSTIP + ':9205')
 
-words = [randomword(3), randomword(4), randomword(5)]
+# words = [randomword(4,9), randomword(4,9), randomword(4,9)]
+words = ['iran', 'dose', 'equal']
 # dbs = [(ELASTIC, es), (ELASTIC5, es5), (MSSQL, mssql_conn), (MYSQL, mysql_connection), (MONGODB, client)]
 dbs = [(MSSQL, mssql_conn), (MYSQL, mysql_connection), (MONGODB, client)]
 ops = [SINGLE, AND, OR]
@@ -22,6 +23,7 @@ ops = [SINGLE, AND, OR]
 print('words: ', words)
 
 for op in ops:
+    print(words)
     print(op)
     for db in dbs:
         r = search_words(db[0], op, words, db[1])
@@ -32,7 +34,7 @@ for op in ops:
             s = '\t\t'
         print ("%s%s%s\t%s" %(db[0], s, r[0], r[1]))
     print("\n")
-    words = [randomword(3), randomword(4), randomword(5)]
+    # words = [randomword(4,9), randomword(4,9), randomword(4,9)]
 
 # for item in search_words(MSSQL, AND, words)[0]:
 #     print(item)

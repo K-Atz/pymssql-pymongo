@@ -54,7 +54,7 @@ def search_mysql(optype, words, mysql_connection):
         req = ""
         for i in range(0, len(words)-1):
             req += '+%s ' % words[i]
-        req += '+%s' % words[i]
+        req += '+%s' % words[-1]
         start = datetime.datetime.now()
         mysql_cursor.execute("SELECT COUNT(*) as total_hits FROM %s WHERE MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (TABLE, COLUMN, req))
         cnt = list(mysql_cursor)[0][0]
@@ -63,7 +63,7 @@ def search_mysql(optype, words, mysql_connection):
         req = ""
         for i in range(0, len(words)-1):
             req += '%s ' % words[i]
-        req += '%s' % words[i]
+        req += '%s' % words[-1]
         start = datetime.datetime.now()
         mysql_cursor.execute("SELECT COUNT(*) as total_hits FROM %s WHERE MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (TABLE, COLUMN, req))
         cnt = list(mysql_cursor)[0][0]
@@ -102,15 +102,15 @@ def containnumber(word):
 
 conn = pymssql.connect(server='172.16.8.10\RICESTSQLSERVER', user='sa', password='RICEST@SQLSERVER2008', database='NOSQL_db')  
 cursor = conn.cursor()
-def randomword(n):
+def randomword(n,m):
     cmd = "SELECT Abstract FROM (SELECT ROW_NUMBER() OVER (ORDER BY ID ASC) AS rownumber, Abstract FROM %s) AS foo WHERE rownumber = %d"  % (SOURCE_TABLE, random.randint(1, NUMBER_OF_RECORDS)) 
     cursor.execute(cmd)
     for item in cursor:
         word_tokens = word_tokenize(item[0])
     w = word_tokens[random.randint(0, len(word_tokens)-1)]
-    if (len(w) >= n and (w.lower() not in STOPWORDS) and not containnumber(w)):
+    if (w.isalpha() and len(w) <= m and len(w) >= n and (w.lower() not in STOPWORDS)):
         return w.lower()
-    return randomword(n)
+    return randomword(n,m)
 
 #--------------------------------------------------------------------------------------------#
 
