@@ -73,4 +73,4 @@ SRC = "randomwordstemp.txt"
 
 # print("mysql mean for AND: ", runworkload_mysql(AND, SRC, mysql_connection))
 # print("mysql mean for OR: ", runworkload_mysql(OR, SRC, mysql_connection))
-# print("mysql mean for SINGLE: ", runworkload_mysql(SINGLE, SRC, mysql_connection))
+print("mysql mean for SINGLE: ", runworkload_mysql(SINGLE, SRC, mysql_connection))

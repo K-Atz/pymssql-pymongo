@@ -74,8 +74,16 @@ def mysql_search(optype, words, mysql_connection):
             req += '%s ' % words[i]
         req += '%s' % words[-1]
     start = datetime.datetime.now()
-    tempstr = "MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (COLUMN, req)
-    mysql_cursor.execute("SELECT %s as score, _id FROM %s WHERE %s ORDER BY score DESC" % (tempstr, TABLE, tempstr))
+    tempstr0 = ""
+    if optype == SINGLE:
+        tempstr0 = "%s" % words[0]
+    else:
+        tempstr0 = "%s" % words[0]
+        for i in range(1, len(words)):
+            tempstr0 +=",%s" % words[i]
+    tempstr1 = "MATCH(%s) AGAINST ('%s' IN NATURAL LANGUAGE MODE)" % (COLUMN, tempstr0)
+    tempstr2 = "MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (COLUMN, req)
+    mysql_cursor.execute("SELECT %s as score, _id FROM %s WHERE %s ORDER BY score DESC" % (tempstr1, TABLE, tempstr2))
     end = datetime.datetime.now()
     elapsed_time = end - start
 
@@ -88,7 +96,7 @@ def mysql_search(optype, words, mysql_connection):
     sum = 0
     for item in mysql_cursor:
         sum += 1
-        print("SCORE: %d | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]))
+        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]))
     print("---------------")
     end = datetime.datetime.now()
     elapsed_time += (end - start)
@@ -128,7 +136,7 @@ def mssql_search(optype, words, mssql_conn):
     sum = 0
     for item in mssql_cursor:
         sum += 1
-        print("SCORE: %d | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]))
+        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]))
     print("---------------")
     end = datetime.datetime.now()
     elapsed_time += (end - start)
@@ -176,7 +184,7 @@ def mongo_search(optype, words, client):
     sum = 0
     for item in result:
         sum += 1
-        print("SCORE: %d | ITEM NUMBER %d | ITEM ID: %s" % (item['score'], sum, item['_id']))
+        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['score'], sum, item['_id']))
     print("---------------")
     end = datetime.datetime.now()
     elapsed_time += (end - start)
@@ -236,7 +244,7 @@ def elastic5_search(optype, words, es): #fieldname = 'abstract'
         all_hits = page['hits']['hits']
         for item in all_hits:
             sum += 1
-            print("SCORE: %d | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']))
+            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']))
         if sum == hits_count:
             break
         page = es.scroll(scroll_id = sid, scroll = '2m')
