@@ -71,8 +71,36 @@ def search_mysql(optype, words, mysql_connection):
     return (cnt, end-start)
 
 #--------------------------------------------------------------------------------------------#
+'''
+SELECT  *
+FROM [Schema].[SomeFullTextIndexedView] t 
+INNER JOIN CONTAINSTABLE([Schema].[SomeFullTextIndexedView], ColumnToSearch, '"*bla*" OR "*di*" OR "*bladi*"') c
+    ON t.ID = c.[KEY]
+ORDER BY [RANK] DESC
 
+'''
 def search_mssql(optype, words, mssql_conn):  
+    mssql_cursor = mssql_conn.cursor()
+    tempstr = ""
+    if optype == SINGLE:
+        tempstr += words[0]
+    elif optype == AND or optype == OR:
+        op = None
+        if optype == AND:
+            op = 'AND'
+        else:
+            op = 'OR'
+        tempstr = words[0]
+        for i in range(1, len(words)):
+            tempstr += " %s %s" % (op, words[i])
+    cmd = "SELECT COUNT(*) FROM %s t INNER JOIN CONTAINSTABLE(%s, %s, '%s') c ON t._id = c.[KEY]" % (TABLE, TABLE, COLUMN, tempstr)
+    start = datetime.datetime.now()
+    mssql_cursor.execute(cmd)
+    cnt = list(mssql_cursor)[0][0]
+    end = datetime.datetime.now()
+    return (cnt, end-start)
+
+def search_mssql_old(optype, words, mssql_conn):  
     mssql_cursor = mssql_conn.cursor()
     cmd = 'SELECT COUNT(*) as total_hits FROM %s WHERE ' % TABLE
     if optype == SINGLE:
@@ -92,6 +120,7 @@ def search_mssql(optype, words, mssql_conn):
     cnt = list(mssql_cursor)[0][0]
     end = datetime.datetime.now()
     return (cnt, end-start)
+
 
 #--------------------------------------------------------------------------------------------#
 

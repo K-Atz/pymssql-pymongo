@@ -71,9 +71,9 @@ def search_mysql(optype, words, mysql_connection):
 
 def search_mssql(optype, words, mssql_conn):  
     mssql_cursor = mssql_conn.cursor()
-    cmd = 'SELECT COUNT(*) as total_hits FROM %s WHERE ' % TABLE
+    tempstr = ""
     if optype == SINGLE:
-        cmd += "CONTAINS(%s,'%s')" % (COLUMN, words[0])
+        tempstr += words[0]
     elif optype == AND or optype == OR:
         op = None
         if optype == AND:
@@ -83,7 +83,7 @@ def search_mssql(optype, words, mssql_conn):
         tempstr = words[0]
         for i in range(1, len(words)):
             tempstr += " %s %s" % (op, words[i])
-        cmd += "CONTAINS(%s,'%s')" % (COLUMN, tempstr)
+    cmd = "SELECT COUNT(*) FROM %s t INNER JOIN CONTAINSTABLE(%s, %s, '%s') c ON t._id = c.[KEY]" % (TABLE, TABLE, COLUMN, tempstr)
     start = datetime.datetime.now()
     mssql_cursor.execute(cmd)
     cnt = list(mssql_cursor)[0][0]
