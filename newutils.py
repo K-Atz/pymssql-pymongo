@@ -47,9 +47,9 @@ def randomword(n,m):
 
 def search_words(db, optype, words, connection):
     if db == MSSQL:
-        return search_mssql(optype, words, connection)
+        return mssql_search(optype, words, connection)
     if db == MYSQL:
-        return search_mysql(optype, words, connection)
+        return mysql_search(optype, words, connection)
     if db == MONGODB:
         return mongo_search(optype, words, connection)
     if db == ELASTIC5:
@@ -57,35 +57,43 @@ def search_words(db, optype, words, connection):
 
 #--------------------------------------------------------------------------------------------#
 
-def search_mysql(optype, words, mysql_connection):
+def mysql_search(optype, words, mysql_connection):
     mysql_cursor = mysql_connection.cursor()
     start = None
     end = None
-    cnt = None
+    elapsed_time = None
+    req = ""
     if optype == SINGLE:
-        start = datetime.datetime.now()
-        mysql_cursor.execute("SELECT COUNT(*) as total_hits FROM %s WHERE MATCH(%s) AGAINST ('+%s' IN BOOLEAN MODE)" % (TABLE, COLUMN, words[0]))
-        cnt = list(mysql_cursor)[0][0]
-        end = datetime.datetime.now()
+        req += '+' + words[0]
     elif optype == AND:
-        req = ""
         for i in range(0, len(words)-1):
             req += '+%s ' % words[i]
         req += '+%s' % words[-1]
-        start = datetime.datetime.now()
-        mysql_cursor.execute("SELECT COUNT(*) as total_hits FROM %s WHERE MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (TABLE, COLUMN, req))
-        cnt = list(mysql_cursor)[0][0]
-        end = datetime.datetime.now()
     elif optype == OR:
-        req = ""
         for i in range(0, len(words)-1):
             req += '%s ' % words[i]
         req += '%s' % words[-1]
-        start = datetime.datetime.now()
-        mysql_cursor.execute("SELECT COUNT(*) as total_hits FROM %s WHERE MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (TABLE, COLUMN, req))
-        cnt = list(mysql_cursor)[0][0]
-        end = datetime.datetime.now()
-    return (cnt, end-start)
+    start = datetime.datetime.now()
+    tempstr = "MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (COLUMN, req)
+    mysql_cursor.execute("SELECT %s as score, _id FROM %s WHERE %s ORDER BY score DESC" % (tempstr, TABLE, tempstr))
+    end = datetime.datetime.now()
+    elapsed_time = end - start
+
+    start = datetime.datetime.now()
+    temp_str = ""
+    for w in words:
+        temp_str += w + " "
+    print("---------------\nWORDS: " + temp_str + "\n\nITEMS:")
+
+    sum = 0
+    for item in mysql_cursor:
+        sum += 1
+        print("SCORE: %d | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]))
+    print("---------------")
+    end = datetime.datetime.now()
+    elapsed_time += (end - start)
+    td = elapsed_time.total_seconds()
+    return (sum, td)
 
 #--------------------------------------------------------------------------------------------#
 

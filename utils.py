@@ -45,29 +45,21 @@ def search_mysql(optype, words, mysql_connection):
     start = None
     end = None
     cnt = None
+    req = ""
     if optype == SINGLE:
-        start = datetime.datetime.now()
-        mysql_cursor.execute("SELECT COUNT(*) as total_hits FROM %s WHERE MATCH(%s) AGAINST ('+%s' IN BOOLEAN MODE)" % (TABLE, COLUMN, words[0]))
-        cnt = list(mysql_cursor)[0][0]
-        end = datetime.datetime.now()
+        req += '+' + words[0]
     elif optype == AND:
-        req = ""
         for i in range(0, len(words)-1):
             req += '+%s ' % words[i]
         req += '+%s' % words[-1]
-        start = datetime.datetime.now()
-        mysql_cursor.execute("SELECT COUNT(*) as total_hits FROM %s WHERE MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (TABLE, COLUMN, req))
-        cnt = list(mysql_cursor)[0][0]
-        end = datetime.datetime.now()
     elif optype == OR:
-        req = ""
         for i in range(0, len(words)-1):
             req += '%s ' % words[i]
         req += '%s' % words[-1]
-        start = datetime.datetime.now()
-        mysql_cursor.execute("SELECT COUNT(*) as total_hits FROM %s WHERE MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (TABLE, COLUMN, req))
-        cnt = list(mysql_cursor)[0][0]
-        end = datetime.datetime.now()
+    start = datetime.datetime.now()
+    mysql_cursor.execute("SELECT COUNT(*) as total_hits FROM %s WHERE MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (TABLE, COLUMN, req))
+    cnt = list(mysql_cursor)[0][0]
+    end = datetime.datetime.now()
     return (cnt, end-start)
 
 #--------------------------------------------------------------------------------------------#
