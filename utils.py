@@ -83,9 +83,10 @@ def search_mssql(optype, words, mssql_conn):
             op = 'AND'
         else:
             op = 'OR'
-        for i in range(0, len(words)-1):
-            cmd += "CONTAINS(%s,'%s') %s " % (COLUMN, words[i], op)
-        cmd += "CONTAINS(%s,'%s')" % (COLUMN, words[-1])
+        tempstr = words[0]
+        for i in range(1, len(words)):
+            tempstr += " %s %s" % (op, words[i])
+        cmd += "CONTAINS(%s,'%s')" % (COLUMN, tempstr)
     start = datetime.datetime.now()
     mssql_cursor.execute(cmd)
     cnt = list(mssql_cursor)[0][0]
