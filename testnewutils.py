@@ -1,6 +1,7 @@
 from newutils import *
 
 es = Elasticsearch5(HOSTIP + ':9205')
+es7 = Elasticsearch(HOSTIP)
 client = pymongo.MongoClient('mongodb://%s:27023/' % HOSTIP)
 mssql_conn = pymssql.connect(server=HOSTIP, user='sa', password='MSSql-pwd', database=DB)
 mysql_connection = mysql.connector.connect(host='localhost', user="root", passwd="password", db=DB)
@@ -14,6 +15,19 @@ def runworkload_es5(optype, ref, es):
                 break
             words = line.rstrip().split()
             re = elastic5_search(optype, words, es)
+            times += [re[1]] 
+    mean = sum(times)/len(times)
+    return mean*1000
+
+def runworkload_es7(optype, ref, es):
+    times = []
+    with open(ref,"r+") as file1:
+        while True:
+            line = file1.readline()
+            if line == "":
+                break
+            words = line.rstrip().split()
+            re = elastic7_search(optype, words, es)
             times += [re[1]] 
     mean = sum(times)/len(times)
     return mean*1000
@@ -73,4 +87,8 @@ SRC = "randomwordstemp.txt"
 
 # print("mysql mean for AND: ", runworkload_mysql(AND, SRC, mysql_connection))
 # print("mysql mean for OR: ", runworkload_mysql(OR, SRC, mysql_connection))
-print("mysql mean for SINGLE: ", runworkload_mysql(SINGLE, SRC, mysql_connection))
+# print("mysql mean for SINGLE: ", runworkload_mysql(SINGLE, SRC, mysql_connection))
+
+# print("es mean for AND: ", runworkload_es7(AND, SRC, es7))
+# print("es mean for OR: ", runworkload_es7(OR, SRC, es7))
+# print("es mean for SINGLE: ", runworkload_es7(SINGLE, SRC, es7))

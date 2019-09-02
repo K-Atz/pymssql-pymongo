@@ -10,10 +10,11 @@ HOSTIP = '172.16.13.26'
 DB = 'nosqlprj'
 TABLE = 'records'
 COLUMN = 'Abstract'
-TIMEOUT = 100000
+# TIMEOUT = 100000
 AND = 'and'
 OR = 'or'
 SINGLE = 'single'
+MAX = 100
 
 SOURCE_TABLE = "[NOSQL_db].[dbo].[LangFilter]"
 NUMBER_OF_RECORDS = 2000000
@@ -44,16 +45,6 @@ def randomword(n,m):
     if (w.isalpha() and len(w) <= m and len(w) >= n and (w.lower() not in STOPWORDS)):
         return w.lower()
     return randomword(n,m)
-
-def search_words(db, optype, words, connection):
-    if db == MSSQL:
-        return mssql_search(optype, words, connection)
-    if db == MYSQL:
-        return mysql_search(optype, words, connection)
-    if db == MONGODB:
-        return mongo_search(optype, words, connection)
-    if db == ELASTIC5:
-        return elastic5_search(optype, words, connection)
 
 #--------------------------------------------------------------------------------------------#
 
@@ -191,7 +182,7 @@ def mongo_search(optype, words, client):
     td = elapsed_time.total_seconds()
     return (sum, td)
 
-def elastic5_search(optype, words, es): #fieldname = 'abstract'
+def elastic5_search(optype, words, es):
     body = {}
     if optype == SINGLE:
         body = {
@@ -233,6 +224,73 @@ def elastic5_search(optype, words, es): #fieldname = 'abstract'
     page = es.search(index = DB,doc_type = TABLE,scroll = '2m',body=body)
     sid = page['_scroll_id']
     hits_count = page['hits']['total']
+
+    temp_str = ""
+    for w in words:
+        temp_str += w + " "
+    print("---------------\nWORDS: " + temp_str + "\n\nITEMS:")
+
+    sum = 0
+    while True:
+        all_hits = page['hits']['hits']
+        for item in all_hits:
+            sum += 1
+            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']))
+        if sum == hits_count:
+            break
+        page = es.scroll(scroll_id = sid, scroll = '2m')
+        sid = page['_scroll_id']
+
+    print("---------------")
+    end = datetime.datetime.now()
+    td = (end-start).total_seconds()
+    return (hits_count, td)
+
+def elastic7_search(optype, words, es):
+    body = {}
+    if optype == SINGLE:
+        body = {
+            'size': MAX,
+            "query" : {
+                "match" : {
+                    COLUMN : words[0]
+                }
+            }
+        }
+    else:
+        search_words = []
+        for w in words:
+            search_words += [
+                {
+                    "match" : {
+                        COLUMN : w
+                    }
+                }
+            ]
+        if optype == AND:
+            body = {
+                'size': MAX,
+                "query" : {
+                    "bool" : {
+                        "must" : search_words
+                    }
+                }
+            }
+        elif optype == OR:
+            body = {
+                'size': MAX,
+                "query" : {
+                    "bool" : {
+                        "should" : search_words
+                    }
+                }
+            }
+
+    start = datetime.datetime.now()
+
+    page = es.search(index = DB,scroll = '2m',body=body)
+    sid = page['_scroll_id']
+    hits_count = page['hits']['total']['value']
 
     temp_str = ""
     for w in words:
