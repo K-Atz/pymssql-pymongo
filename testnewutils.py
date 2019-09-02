@@ -92,3 +92,5 @@ SRC = "randomwords.txt"
 # print("es7 mean for AND: ", runworkload_es7(AND, SRC, es7))
 # print("es7 mean for OR: ", runworkload_es7(OR, SRC, es7))
 # print("es7 mean for SINGLE: ", runworkload_es7(SINGLE, SRC, es7))
+
+re = elastic5_search(SINGLE, ['data science'], es)
