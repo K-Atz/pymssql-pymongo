@@ -25,6 +25,26 @@ MONGODB = 'mongodb'
 ELASTIC = 'elastic'
 ELASTIC5 = 'elastic5'
 
+#--------------------------------------------------------------------------------------------#
+
+def containnumber(word):
+    for i in range(0, 10):
+        if str(i) in word:
+            return True
+    return False
+
+conn = pymssql.connect(server='172.16.8.10\RICESTSQLSERVER', user='sa', password='RICEST@SQLSERVER2008', database='NOSQL_db')  
+cursor = conn.cursor()
+def randomword(n,m):
+    cmd = "SELECT Abstract FROM (SELECT ROW_NUMBER() OVER (ORDER BY ID ASC) AS rownumber, Abstract FROM %s) AS foo WHERE rownumber = %d"  % (SOURCE_TABLE, random.randint(1, NUMBER_OF_RECORDS)) 
+    cursor.execute(cmd)
+    for item in cursor:
+        word_tokens = word_tokenize(item[0])
+    w = word_tokens[random.randint(0, len(word_tokens)-1)]
+    if (w.isalpha() and len(w) <= m and len(w) >= n and (w.lower() not in STOPWORDS)):
+        return w.lower()
+    return randomword(n,m)
+
 def search_words(db, optype, words, connection):
     if db == MSSQL:
         return search_mssql(optype, words, connection)
@@ -69,9 +89,10 @@ def search_mysql(optype, words, mysql_connection):
 
 #--------------------------------------------------------------------------------------------#
 
-def search_mssql(optype, words, mssql_conn):  
+def mssql_search(optype, words, mssql_conn):  
     mssql_cursor = mssql_conn.cursor()
     tempstr = ""
+    elapsed_time = None
     if optype == SINGLE:
         tempstr += words[0]
     elif optype == AND or optype == OR:
@@ -83,32 +104,28 @@ def search_mssql(optype, words, mssql_conn):
         tempstr = words[0]
         for i in range(1, len(words)):
             tempstr += " %s %s" % (op, words[i])
-    cmd = "SELECT COUNT(*) FROM %s t INNER JOIN CONTAINSTABLE(%s, %s, '%s') c ON t._id = c.[KEY]" % (TABLE, TABLE, COLUMN, tempstr)
+    cmd = "SELECT RANK, t._id FROM %s t INNER JOIN CONTAINSTABLE(%s, %s, '%s') c ON t._id = c.[KEY] ORDER BY [RANK] DESC" % (TABLE, TABLE, COLUMN, tempstr)
     start = datetime.datetime.now()
     mssql_cursor.execute(cmd)
-    cnt = list(mssql_cursor)[0][0]
     end = datetime.datetime.now()
-    return (cnt, end-start)
+    elapsed_time = end - start
 
-#--------------------------------------------------------------------------------------------#
+    elapsed_time = end - start
+    start = datetime.datetime.now()
+    temp_str = ""
+    for w in words:
+        temp_str += w + " "
+    print("---------------\nWORDS: " + temp_str + "\n\nITEMS:")
 
-def containnumber(word):
-    for i in range(0, 10):
-        if str(i) in word:
-            return True
-    return False
-
-conn = pymssql.connect(server='172.16.8.10\RICESTSQLSERVER', user='sa', password='RICEST@SQLSERVER2008', database='NOSQL_db')  
-cursor = conn.cursor()
-def randomword(n,m):
-    cmd = "SELECT Abstract FROM (SELECT ROW_NUMBER() OVER (ORDER BY ID ASC) AS rownumber, Abstract FROM %s) AS foo WHERE rownumber = %d"  % (SOURCE_TABLE, random.randint(1, NUMBER_OF_RECORDS)) 
-    cursor.execute(cmd)
-    for item in cursor:
-        word_tokens = word_tokenize(item[0])
-    w = word_tokens[random.randint(0, len(word_tokens)-1)]
-    if (w.isalpha() and len(w) <= m and len(w) >= n and (w.lower() not in STOPWORDS)):
-        return w.lower()
-    return randomword(n,m)
+    sum = 0
+    for item in mssql_cursor:
+        sum += 1
+        print("SCORE: %d | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]))
+    print("---------------")
+    end = datetime.datetime.now()
+    elapsed_time += (end - start)
+    td = elapsed_time.total_seconds()
+    return (sum, td)
 
 #--------------------------------------------------------------------------------------------#
 
