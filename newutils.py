@@ -77,18 +77,18 @@ def mysql_search(optype, words, mysql_connection):
     mysql_cursor.execute("SELECT %s as score, _id FROM %s WHERE %s ORDER BY score DESC" % (tempstr1, TABLE, tempstr2))
     end = datetime.datetime.now()
     elapsed_time = end - start
-
+    f=open("mysqlresults.txt", "a+")
     start = datetime.datetime.now()
     temp_str = ""
     for w in words:
         temp_str += w + " "
-    print("---------------\nWORDS: " + temp_str + "\n\nITEMS:")
+    print("---------------\nWORDS: " + temp_str + "\n\n%s RESULT ITEMS:" % optype, file= f)
 
     sum = 0
     for item in mysql_cursor:
         sum += 1
-        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]))
-    print("---------------")
+        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]), file= f)
+    print("---------------", file= f)
     end = datetime.datetime.now()
     elapsed_time += (end - start)
     td = elapsed_time.total_seconds()
@@ -116,19 +116,18 @@ def mssql_search(optype, words, mssql_conn):
     mssql_cursor.execute(cmd)
     end = datetime.datetime.now()
     elapsed_time = end - start
-
-    elapsed_time = end - start
+    f=open("mssqlresults.txt", "a+")
     start = datetime.datetime.now()
     temp_str = ""
     for w in words:
         temp_str += w + " "
-    print("---------------\nWORDS: " + temp_str + "\n\nITEMS:")
+    print("---------------\nWORDS: " + temp_str + "\n\n%s RESULT ITEMS:" % optype, file = f)
 
     sum = 0
     for item in mssql_cursor:
         sum += 1
-        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]))
-    print("---------------")
+        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]), file = f)
+    print("---------------", file = f)
     end = datetime.datetime.now()
     elapsed_time += (end - start)
     td = elapsed_time.total_seconds()
@@ -166,17 +165,18 @@ def mongo_search(optype, words, client):
         end = datetime.datetime.now()
 
     elapsed_time = end - start
+    f=open("mongoresults.txt", "a+")
     start = datetime.datetime.now()
     temp_str = ""
     for w in words:
         temp_str += w + " "
-    print("---------------\nWORDS: " + temp_str + "\n\nITEMS:")
+    print("---------------\nWORDS: " + temp_str + "\n\n%s RESULT ITEMS:" % optype, file=f)
 
     sum = 0
     for item in result:
         sum += 1
-        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['score'], sum, item['_id']))
-    print("---------------")
+        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['score'], sum, item['_id']), file=f)
+    print("---------------", file=f)
     end = datetime.datetime.now()
     elapsed_time += (end - start)
     td = elapsed_time.total_seconds()
@@ -186,6 +186,7 @@ def elastic5_search(optype, words, es):
     body = {}
     if optype == SINGLE:
         body = {
+            "size": MAX,
             "query" : {
                 "match" : {
                     COLUMN : words[0]
@@ -204,6 +205,7 @@ def elastic5_search(optype, words, es):
             ]
         if optype == AND:
             body = {
+                "size": MAX,
                 "query" : {
                     "bool" : {
                         "must" : search_words
@@ -212,6 +214,7 @@ def elastic5_search(optype, words, es):
             }
         elif optype == OR:
             body = {
+                "size": MAX,
                 "query" : {
                     "bool" : {
                         "should" : search_words
@@ -219,6 +222,7 @@ def elastic5_search(optype, words, es):
                 }
             }
 
+    f=open("es5results.txt", "a+")
     start = datetime.datetime.now()
 
     page = es.search(index = DB,doc_type = TABLE,scroll = '2m',body=body)
@@ -228,20 +232,20 @@ def elastic5_search(optype, words, es):
     temp_str = ""
     for w in words:
         temp_str += w + " "
-    print("---------------\nWORDS: " + temp_str + "\n\nITEMS:")
+    print("---------------\nWORDS: " + temp_str + "\n\n%s RESULT ITEMS:" % optype, file=f)
 
     sum = 0
     while True:
         all_hits = page['hits']['hits']
         for item in all_hits:
             sum += 1
-            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']))
+            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']), file=f)
         if sum == hits_count:
             break
         page = es.scroll(scroll_id = sid, scroll = '2m')
         sid = page['_scroll_id']
 
-    print("---------------")
+    print("---------------", file=f)
     end = datetime.datetime.now()
     td = (end-start).total_seconds()
     return (hits_count, td)
@@ -250,7 +254,7 @@ def elastic7_search(optype, words, es):
     body = {}
     if optype == SINGLE:
         body = {
-            'size': MAX,
+            "size": MAX,
             "query" : {
                 "match" : {
                     COLUMN : words[0]
@@ -269,7 +273,7 @@ def elastic7_search(optype, words, es):
             ]
         if optype == AND:
             body = {
-                'size': MAX,
+                "size": MAX,
                 "query" : {
                     "bool" : {
                         "must" : search_words
@@ -278,7 +282,7 @@ def elastic7_search(optype, words, es):
             }
         elif optype == OR:
             body = {
-                'size': MAX,
+                "size": MAX,
                 "query" : {
                     "bool" : {
                         "should" : search_words
@@ -286,6 +290,7 @@ def elastic7_search(optype, words, es):
                 }
             }
 
+    f=open("es7results.txt", "a+")
     start = datetime.datetime.now()
 
     page = es.search(index = DB,scroll = '2m',body=body)
@@ -295,20 +300,20 @@ def elastic7_search(optype, words, es):
     temp_str = ""
     for w in words:
         temp_str += w + " "
-    print("---------------\nWORDS: " + temp_str + "\n\nITEMS:")
+    print("---------------\nWORDS: " + temp_str + "\n\n%s RESULT ITEMS:" % optype, file=f)
 
     sum = 0
     while True:
         all_hits = page['hits']['hits']
         for item in all_hits:
             sum += 1
-            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']))
+            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']), file=f)
         if sum == hits_count:
             break
         page = es.scroll(scroll_id = sid, scroll = '2m')
         sid = page['_scroll_id']
 
-    print("---------------")
+    print("---------------", file=f)
     end = datetime.datetime.now()
     td = (end-start).total_seconds()
     return (hits_count, td)

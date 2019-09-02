@@ -71,11 +71,11 @@ def runworkload_mysql(optype, ref, es):
     mean = sum(times)/len(times)
     return mean*1000
 
-SRC = "randomwordstemp.txt"
+SRC = "randomwords.txt"
 
-# print("es mean for AND: ", runworkload_es5(AND, SRC, es))
-# print("es mean for OR: ", runworkload_es5(OR, SRC, es))
-# print("es mean for SINGLE: ", runworkload_es5(SINGLE, SRC, es))
+# print("es5 mean for AND: ", runworkload_es5(AND, SRC, es))
+# print("es5 mean for OR: ", runworkload_es5(OR, SRC, es))
+# print("es5 mean for SINGLE: ", runworkload_es5(SINGLE, SRC, es))
 
 # print("mongo mean for AND: ", runworkload_mongo(AND, SRC, client))
 # print("mongo mean for OR: ", runworkload_mongo(OR, SRC, client))
@@ -89,6 +89,6 @@ SRC = "randomwordstemp.txt"
 # print("mysql mean for OR: ", runworkload_mysql(OR, SRC, mysql_connection))
 # print("mysql mean for SINGLE: ", runworkload_mysql(SINGLE, SRC, mysql_connection))
 
-# print("es mean for AND: ", runworkload_es7(AND, SRC, es7))
-# print("es mean for OR: ", runworkload_es7(OR, SRC, es7))
-# print("es mean for SINGLE: ", runworkload_es7(SINGLE, SRC, es7))
+# print("es7 mean for AND: ", runworkload_es7(AND, SRC, es7))
+# print("es7 mean for OR: ", runworkload_es7(OR, SRC, es7))
+# print("es7 mean for SINGLE: ", runworkload_es7(SINGLE, SRC, es7))
