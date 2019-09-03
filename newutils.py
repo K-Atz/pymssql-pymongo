@@ -14,7 +14,7 @@ COLUMN = 'Abstract'
 AND = 'and'
 OR = 'or'
 SINGLE = 'single'
-MAX = 100
+MAX = 10
 
 SOURCE_TABLE = "[NOSQL_db].[dbo].[LangFilter]"
 NUMBER_OF_RECORDS = 2000000
@@ -225,7 +225,7 @@ def elastic5_search(optype, words, es):
     f=open("es5results.txt", "a+")
     start = datetime.datetime.now()
 
-    page = es.search(index = DB,doc_type = TABLE,scroll = '2m',body=body)
+    page = es.search(index = DB,doc_type = TABLE,scroll = '2m',body=body, request_timeout=60)
     sid = page['_scroll_id']
     hits_count = page['hits']['total']
 
@@ -250,6 +250,7 @@ def elastic5_search(optype, words, es):
     td = (end-start).total_seconds()
     return (hits_count, td)
 
+'''
 def elastic7_search(optype, words, es):
     body = {}
     if optype == SINGLE:
@@ -317,3 +318,4 @@ def elastic7_search(optype, words, es):
     end = datetime.datetime.now()
     td = (end-start).total_seconds()
     return (hits_count, td)
+'''

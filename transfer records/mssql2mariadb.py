@@ -9,7 +9,7 @@ mysql_connection = mysql.connector.connect(host='localhost', user="root", passwd
 cursor2 = mysql_connection.cursor()
 
  
-cursor.execute('SELECT ID, DocID, Abstract FROM [NOSQL_db].[dbo].[LangFilter]') #2 Mil Records
+cursor.execute('SELECT TOP(3000000) ID, DocID, Abstract FROM [NOSQL_db].[dbo].[LangFilterIEEE]') #3 Mil Records
 
 sum = 0
 bulk = 0
@@ -21,5 +21,5 @@ for item in cursor:
         sum = 0
         bulk+=1
         mysql_connection.commit()
-        print("Bulk Count: %d" % bulk)
+        print("\rBulk Count: %d" % bulk, end="")
 
