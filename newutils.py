@@ -25,6 +25,8 @@ MYSQL = 'mysql'
 MONGODB = 'mongodb'
 ELASTIC = 'elastic'
 ELASTIC5 = 'elastic5'
+ELASTIC5_3 = 'elastic5_3sh'
+ELASTIC5_6 = 'elastic5_6sh'
 
 #--------------------------------------------------------------------------------------------#
 
@@ -182,7 +184,7 @@ def mongo_search(optype, words, client):
     td = elapsed_time.total_seconds()
     return (sum, td)
 
-def elastic5_search(optype, words, es):
+def elastic5_search(db, optype, words, es):
     body = {}
     if optype == SINGLE:
         body = {
@@ -222,10 +224,10 @@ def elastic5_search(optype, words, es):
                 }
             }
 
-    f=open("es5results.txt", "a+")
+    f=open(db+"results.txt", "a+")
     start = datetime.datetime.now()
 
-    page = es.search(index = DB,doc_type = TABLE,scroll = '2m',body=body, request_timeout=60)
+    page = es.search(index = db,doc_type = TABLE,scroll = '2m',body=body, request_timeout=60)
     sid = page['_scroll_id']
     hits_count = page['hits']['total']
 

@@ -1,10 +1,11 @@
 from newutils import *
 
 es5_client = Elasticsearch5(HOSTIP + ':9205')
+es5_client_3shard = Elasticsearch5(HOSTIP + ':9206')
 # es7_client = Elasticsearch(HOSTIP)
-mongo_client = pymongo.MongoClient('mongodb://%s:27023/' % HOSTIP)
-mssql_client = pymssql.connect(server=HOSTIP, user='sa', password='MSSql-pwd', database=DB)
-mysql_client = mysql.connector.connect(host='localhost', user="root", passwd="password", db=DB)
+# mongo_client = pymongo.MongoClient('mongodb://%s:27023/' % HOSTIP)
+# mssql_client = pymssql.connect(server=HOSTIP, user='sa', password='MSSql-pwd', database=DB)
+# mysql_client = mysql.connector.connect(host='localhost', user="root", passwd="password", db=DB)
 
 def runworkload(db, optype, ref, conn):
     times = []
@@ -20,7 +21,11 @@ def runworkload(db, optype, ref, conn):
             # if db == ELASTIC:
             #     re = elastic7_search(optype, words, conn)
             if db == ELASTIC5:
-                re = elastic5_search(optype, words, conn)
+                re = elastic5_search("nosqlprj", optype, words, conn)
+            elif db == ELASTIC5_3:
+                re = elastic5_search("nosqlprj-3shard", optype, words, conn)
+            elif db == ELASTIC5_6:
+                re = elastic5_search("nosqlprj-6shard", optype, words, conn)
             elif db == MONGODB:
                 re = mongo_search(optype, words, conn)
             elif db == MSSQL:
@@ -37,7 +42,7 @@ def runworkload(db, optype, ref, conn):
 # DBS = [(MSSQL, mssql_client), (MYSQL, mysql_client), (MONGODB, mongo_client), (ELASTIC5, es5_client)]
 SRC = "randomwordstemp.txt"
 OPS = [AND]
-DBS = [(ELASTIC5, es5_client), (MSSQL, mssql_client), (MYSQL, mysql_client)]
+DBS = [(ELASTIC5, es5_client), (ELASTIC5_3, es5_client_3shard), (ELASTIC5_6, es5_client_3shard)]
 
 for db in DBS:
     for op in OPS:

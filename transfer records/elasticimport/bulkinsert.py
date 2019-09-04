@@ -5,7 +5,7 @@ from elasticsearch import helpers
 
 BULK_SIZE = 50000
 
-es = Elasticsearch('172.16.13.26:9206')
+es = Elasticsearch('172.16.13.26:9206', timeout=120)
 
 conn = pymssql.connect(server='172.16.8.10\RICESTSQLSERVER', user='sa', password='RICEST@SQLSERVER2008', database='NOSQL_db')  
 cursor = conn.cursor()
