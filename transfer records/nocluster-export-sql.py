@@ -29,6 +29,8 @@ for item in cursor:
     new_dict['DocID'] = item[1]
     new_dict['Abstract'] = item[2]
     mycol.insert_one(new_dict)
+    mycol_3sh.insert_one(new_dict)
+    mycol_6sh.insert_one(new_dict)
     sum+=1
     print("\r %d items migrated to Mongo." % sum, end="")
 
@@ -40,5 +42,7 @@ for item in cursor:
     new_dict['DocID'] = item[1]
     new_dict['Abstract'] = item[2]
     mycol.insert_one(new_dict)
+    mycol_3sh.insert_one(new_dict)
+    mycol_6sh.insert_one(new_dict)
     sum+=1
     print("\r %d items migrated to Mongo." % sum, end="")
