@@ -4,9 +4,9 @@ import pymssql
 SQL_EXPORT_DB = 'nosqlprj'
 RECORDS_COL = 'records'
 
-# client = pymongo.MongoClient('mongodb://172.16.13.26:27023/')
-# mydb = client[SQL_EXPORT_DB]
-# mycol = mydb[RECORDS_COL]
+client = pymongo.MongoClient('mongodb://172.16.13.26:27023/')
+mydb = client[SQL_EXPORT_DB]
+mycol = mydb[RECORDS_COL]
 
 client_3sh = pymongo.MongoClient('mongodb://172.16.13.26:27030/', retryWrites=False)
 mydb_3sh = client_3sh[SQL_EXPORT_DB]
@@ -28,7 +28,7 @@ for item in cursor:
     new_dict['_id'] = item[0]
     new_dict['DocID'] = item[1]
     new_dict['Abstract'] = item[2]
-    # mycol.insert_one(new_dict)
+    mycol.insert_one(new_dict)
     mycol_3sh.insert_one(new_dict)
     mycol_6sh.insert_one(new_dict)
     sum+=1
@@ -41,7 +41,7 @@ for item in cursor:
     new_dict['_id'] = item[0]
     new_dict['DocID'] = item[1]
     new_dict['Abstract'] = item[2]
-    # mycol.insert_one(new_dict)
+    mycol.insert_one(new_dict)
     mycol_3sh.insert_one(new_dict)
     mycol_6sh.insert_one(new_dict)
     sum+=1
