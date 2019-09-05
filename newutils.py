@@ -24,6 +24,8 @@ STOPWORDS = set(stopwords.words('english'))
 MSSQL = 'sql server'
 MYSQL = 'mysql'
 MONGODB = 'mongodb'
+MONGODB_3 = 'mongodb_3sh'
+MONGODB_6 = 'mongodb_6sh'
 ELASTIC5 = 'elastic5'
 ELASTIC5_3 = 'elastic5_3sh'
 ELASTIC5_6 = 'elastic5_6sh'
@@ -81,7 +83,7 @@ def mysql_search(optype, words, mysql_connection):
     mysql_cursor.execute("SELECT %s as score, _id FROM %s WHERE %s ORDER BY score DESC" % (tempstr1, TABLE, tempstr2))
     end = datetime.datetime.now()
     elapsed_time = end - start
-    f=open("mysqlresults.txt", "a+")
+    f=open("nosqlprj-mysqlresults.txt", "a+")
     temp_str = ""
     for w in words:
         temp_str += w + " "
@@ -121,7 +123,7 @@ def mssql_search(optype, words, mssql_conn):
     mssql_cursor.execute(cmd)
     end = datetime.datetime.now()
     elapsed_time = end - start
-    f=open("mssqlresults.txt", "a+")
+    f=open("nosqlprj-mssqlresults.txt", "a+")
     temp_str = ""
     for w in words:
         temp_str += w + " "
@@ -139,7 +141,7 @@ def mssql_search(optype, words, mssql_conn):
 
 #--------------------------------------------------------------------------------------------#
 
-def mongo_search(optype, words, client):
+def mongo_search(optype, words, client, clustername):
     mydb = client[DB]
     mycol = mydb[TABLE]
     start = None
@@ -169,7 +171,7 @@ def mongo_search(optype, words, client):
         end = datetime.datetime.now()
 
     elapsed_time = end - start
-    f=open("mongoresults.txt", "a+")
+    f=open(clustername+"-mongoresults.txt", "a+")
     temp_str = ""
     for w in words:
         temp_str += w + " "
@@ -235,7 +237,7 @@ def elastic5_search(db, optype, words, es):
                 }
             }
 
-    f=open(db+"elastic5results.txt", "a+")
+    f=open(db+"-elastic5results.txt", "a+")
     start = datetime.datetime.now()
     page = es.search(index = db,doc_type = TABLE,scroll = '2m',body=body, request_timeout=60)
     end = datetime.datetime.now()

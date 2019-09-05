@@ -25,7 +25,11 @@ def runworkload(db, optype, ref, conn):
             elif db == ELASTIC5_6:
                 re = elastic5_search("nosqlprj-6shard", optype, words, conn)
             elif db == MONGODB:
-                re = mongo_search(optype, words, conn)
+                re = mongo_search(optype, words, conn, "nosqlprj")
+            elif db == MONGODB_3:
+                re = mongo_search(optype, words, conn, "nosqlprj-3shard")
+            elif db == MONGODB_6:
+                re = mongo_search(optype, words, conn, "nosqlprj-6shard")
             elif db == MSSQL:
                 re = mssql_search(optype, words, conn)
             elif db == MYSQL:
