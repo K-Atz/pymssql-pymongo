@@ -147,7 +147,7 @@ def mongo_search(optype, words, client):
     result = None
     total_hits = None
     elapsed_time = None
-    if optype == SINGLE:
+    if optype == SINGLE or optype == EXACTPHRASE:
         start = datetime.datetime.now()
         result = mycol.find({"$text": {"$search": ("\"%s\"" % words[0])}},{"score": { "$meta": "textScore" }}).sort([('score', {'$meta': 'textScore'})])
         end = datetime.datetime.now()
@@ -193,6 +193,15 @@ def elastic5_search(db, optype, words, es):
             "size": MAX,
             "query" : {
                 "match" : {
+                    COLUMN : words[0]
+                }
+            }
+        }
+    elif optype == EXACTPHRASE:
+        body = {
+            "size": MAX,
+            "query" : {
+                "match_phrase" : {
                     COLUMN : words[0]
                 }
             }
@@ -249,7 +258,6 @@ def elastic5_search(db, optype, words, es):
             break
         page = es.scroll(scroll_id = sid, scroll = '2m')
         sid = page['_scroll_id']
-    end = datetime.datetime.now()
     print("---------------", file=f)
     end = datetime.datetime.now()
     elapsed_time += (end - start)
