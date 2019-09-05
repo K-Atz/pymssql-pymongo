@@ -18,8 +18,6 @@ def runworkload(db, optype, ref, conn):
             if line == "":
                 break
             words = line.rstrip().split()
-            # if db == ELASTIC:
-            #     re = elastic7_search(optype, words, conn)
             if db == ELASTIC5:
                 re = elastic5_search("nosqlprj", optype, words, conn)
             elif db == ELASTIC5_3:
