@@ -43,7 +43,13 @@ def containnumber(word):
 conn = pymssql.connect(server='172.16.8.10\RICESTSQLSERVER', user='sa', password='RICEST@SQLSERVER2008', database='NOSQL_db')  
 random_word_cursor = conn.cursor()
 
-def randomword(n,m,table,total_num):
+def randomword(n,m):
+    if random.randint(0,1) == 0:
+        table = SOURCE_TABLE
+        total_num = NUMBER_OF_RECORDS
+    else:
+        table = SOURCE_TABLE_IEEE
+        total_num = NUMBER_OF_RECORDS_IEEE
     cmd = "SELECT Abstract FROM (SELECT ROW_NUMBER() OVER (ORDER BY ID ASC) AS rownumber, Abstract FROM %s) AS foo WHERE rownumber = %d"  % (table, random.randint(1, total_num)) 
     random_word_cursor.execute(cmd)
     for item in random_word_cursor:
@@ -53,7 +59,13 @@ def randomword(n,m,table,total_num):
         return w.lower()
     return randomword(n,m,table,total_num)
 
-def randomphrase(n,m,table,total_num):
+def randomphrase(n,m):
+    if random.randint(0,1) == 0:
+        table = SOURCE_TABLE
+        total_num = NUMBER_OF_RECORDS
+    else:
+        table = SOURCE_TABLE_IEEE
+        total_num = NUMBER_OF_RECORDS_IEEE
     cmd = "SELECT Abstract FROM (SELECT ROW_NUMBER() OVER (ORDER BY ID ASC) AS rownumber, Abstract FROM %s) AS foo WHERE rownumber = %d"  % (table, random.randint(1, total_num)) 
     random_word_cursor.execute(cmd)
     for item in random_word_cursor:
@@ -65,7 +77,7 @@ def randomphrase(n,m,table,total_num):
     if (w1.isalpha() and len(w1) <= m and len(w1) >= n and (w1.lower() not in STOPWORDS)):
         if (w2.isalpha() and len(w2) <= m and len(w2) >= n and (w2.lower() not in STOPWORDS)):
             if (w3.isalpha() and len(w3) <= m and len(w3) >= n and (w3.lower() not in STOPWORDS)):
-                return w1+' '+w2+' '+w3
+                return w1.lower()+' '+w2.lower()+' '+w3.lower()
     return randomphrase(n,m,table,total_num)
 
 #--------------------------------------------------------------------------------------------#
