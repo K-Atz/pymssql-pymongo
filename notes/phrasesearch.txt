@@ -1,4 +1,0 @@
-- EXACTPHRASE test for mssql, mysql
-- review start end stamps
-- remove all caches from everywhere
-- extract random phrases

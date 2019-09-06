@@ -1,0 +1,6 @@
+- EXACTPHRASE test for mssql, mysql, mongo, elastic
+- review start end stamps
+- remove all caches from everywhere
+- extract random phrases
+- 1000 random 3 words again
+- 1000 random phrases
