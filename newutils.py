@@ -18,7 +18,9 @@ EXACTPHRASE = 'exact phrase'
 MAX = 10
 
 SOURCE_TABLE = "[NOSQL_db].[dbo].[LangFilter]"
+SOURCE_TABLE_IEEE = "[NOSQL_db].[dbo].[LangFilterIEEE]"
 NUMBER_OF_RECORDS = 2000000
+NUMBER_OF_RECORDS_IEEE = 3000000
 STOPWORDS = set(stopwords.words('english'))
 
 MSSQL = 'sql server'
@@ -39,16 +41,32 @@ def containnumber(word):
     return False
 
 conn = pymssql.connect(server='172.16.8.10\RICESTSQLSERVER', user='sa', password='RICEST@SQLSERVER2008', database='NOSQL_db')  
-cursor = conn.cursor()
-def randomword(n,m):
-    cmd = "SELECT Abstract FROM (SELECT ROW_NUMBER() OVER (ORDER BY ID ASC) AS rownumber, Abstract FROM %s) AS foo WHERE rownumber = %d"  % (SOURCE_TABLE, random.randint(1, NUMBER_OF_RECORDS)) 
-    cursor.execute(cmd)
-    for item in cursor:
+random_word_cursor = conn.cursor()
+
+def randomword(n,m,table,total_num):
+    cmd = "SELECT Abstract FROM (SELECT ROW_NUMBER() OVER (ORDER BY ID ASC) AS rownumber, Abstract FROM %s) AS foo WHERE rownumber = %d"  % (table, random.randint(1, total_num)) 
+    random_word_cursor.execute(cmd)
+    for item in random_word_cursor:
         word_tokens = word_tokenize(item[0])
     w = word_tokens[random.randint(0, len(word_tokens)-1)]
     if (w.isalpha() and len(w) <= m and len(w) >= n and (w.lower() not in STOPWORDS)):
         return w.lower()
-    return randomword(n,m)
+    return randomword(n,m,table,total_num)
+
+def randomphrase(n,m,table,total_num):
+    cmd = "SELECT Abstract FROM (SELECT ROW_NUMBER() OVER (ORDER BY ID ASC) AS rownumber, Abstract FROM %s) AS foo WHERE rownumber = %d"  % (table, random.randint(1, total_num)) 
+    random_word_cursor.execute(cmd)
+    for item in random_word_cursor:
+        word_tokens = word_tokenize(item[0])
+    index = random.randint(0, len(word_tokens)-3)
+    w1 = word_tokens[index]
+    w2 = word_tokens[index+1]
+    w3 = word_tokens[index+2]
+    if (w1.isalpha() and len(w1) <= m and len(w1) >= n and (w1.lower() not in STOPWORDS)):
+        if (w2.isalpha() and len(w2) <= m and len(w2) >= n and (w2.lower() not in STOPWORDS)):
+            if (w3.isalpha() and len(w3) <= m and len(w3) >= n and (w3.lower() not in STOPWORDS)):
+                return w1+' '+w2+' '+w3
+    return randomphrase(n,m,table,total_num)
 
 #--------------------------------------------------------------------------------------------#
 
