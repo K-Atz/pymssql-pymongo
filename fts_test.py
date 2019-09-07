@@ -5,9 +5,9 @@ from newutils import *
 # es7_client = Elasticsearch(HOSTIP)
 # mongo_client = pymongo.MongoClient('mongodb://%s:27023/' % HOSTIP)
 # mongo_client_3sh = pymongo.MongoClient('mongodb://%s:27030/' % HOSTIP)
-# mongo_client_6sh = pymongo.MongoClient('mongodb://%s:27032/' % HOSTIP)
-mssql_client = pymssql.connect(server=HOSTIP, user='sa', password='MSSql-pwd', database=DB)
-mysql_client = mysql.connector.connect(host='localhost', user="root", passwd="password", db=DB)
+mongo_client_6sh = pymongo.MongoClient('mongodb://%s:27032/' % HOSTIP)
+# mssql_client = pymssql.connect(server=HOSTIP, user='sa', password='MSSql-pwd', database=DB)
+# mysql_client = mysql.connector.connect(host='localhost', user="root", passwd="password", db=DB)
 
 def runworkload(db, optype, ref, conn):
     times = []
@@ -50,7 +50,7 @@ def runworkload(db, optype, ref, conn):
 # DBS = [(MSSQL, mssql_client), (MYSQL, mysql_client), (MONGODB, mongo_client), (ELASTIC5, es5_client)]
 SRC = "randomwordstemp.txt"
 OPS = [EXACTPHRASE]
-DBS = [(MSSQL, mssql_client), (MYSQL, mysql_client)]
+DBS = [(MONGODB_6, mongo_client_6sh)]
 
 for db in DBS:
     for op in OPS:
