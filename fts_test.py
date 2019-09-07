@@ -46,7 +46,8 @@ def runworkload(db, optype, ref, conn):
 
 SRC = "randomwordstemp.txt"
 SRCP = "randomphrasetemp.txt"
-OPS = [SINGLE, AND, OR ,EXACTPHRASE]
+# OPS = [SINGLE, AND, OR ,EXACTPHRASE]
+OPS = [AND]
 DBS = [(ELASTIC5, es5_client), (ELASTIC5_3, es5_client_3shard), (ELASTIC5_6, es5_client_3shard)]
 DBS += [(MSSQL, mssql_client), (MYSQL, mysql_client)]
 DBS += [(MONGODB, mongo_client), (MONGODB_3, mongo_client_3sh), (MONGODB_6, mongo_client_6sh)]
