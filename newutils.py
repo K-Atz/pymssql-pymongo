@@ -292,7 +292,7 @@ def elastic5_search(db, optype, words, es):
         for item in all_hits:
             sum += 1
             print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']), file=f)
-        if sum == hits_count:
+        if sum == MAX or sum == hits_count:
             break
         page = es.scroll(scroll_id = sid, scroll = '2m')
         sid = page['_scroll_id']

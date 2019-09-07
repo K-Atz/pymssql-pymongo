@@ -49,7 +49,7 @@ SRCP = "randomphrasetemp.txt"
 OPS = [SINGLE, AND, OR ,EXACTPHRASE]
 DBS = [(ELASTIC5, es5_client), (ELASTIC5_3, es5_client_3shard), (ELASTIC5_6, es5_client_3shard)]
 DBS += [(MSSQL, mssql_client), (MYSQL, mysql_client)]
-DBS += [(MONGODB, mongo_client), (MONGODB_3, mongo_client_3sh) (MONGODB_6, mongo_client_6sh)]
+DBS += [(MONGODB, mongo_client), (MONGODB_3, mongo_client_3sh), (MONGODB_6, mongo_client_6sh)]
 
 for db in DBS:
     for op in OPS:
