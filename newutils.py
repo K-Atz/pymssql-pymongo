@@ -15,7 +15,7 @@ AND = 'and'
 OR = 'or'
 SINGLE = 'single'
 EXACTPHRASE = 'exact phrase'
-MAX = 10
+MAX = 20 # just print first 10 documents to file
 
 SOURCE_TABLE = "[NOSQL_db].[dbo].[LangFilter]"
 SOURCE_TABLE_IEEE = "[NOSQL_db].[dbo].[LangFilterIEEE]"
@@ -122,7 +122,9 @@ def mysql_search(optype, words, mysql_connection):
     sum = 0
     for item in mysql_cursor:
         sum += 1
-        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]), file= f)
+        if sum <= MAX:
+            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]), file= f)
+    print("Total items: %d" % sum, file= f)
     print("---------------", file= f)
     end = datetime.datetime.now()
     elapsed_time += (end - start)
@@ -162,7 +164,9 @@ def mssql_search(optype, words, mssql_conn):
     sum = 0
     for item in mssql_cursor:
         sum += 1
-        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]), file = f)
+        if sum <= MAX:
+            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]), file = f)
+    print("Total items: %d" % sum, file= f)
     print("---------------", file = f)
     end = datetime.datetime.now()
     elapsed_time += (end - start)
@@ -210,7 +214,9 @@ def mongo_search(optype, words, client, clustername):
     sum = 0
     for item in result:
         sum += 1
-        print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['score'], sum, item['_id']), file=f)
+        if sum <= MAX:
+            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['score'], sum, item['_id']), file=f)
+    print("Total items: %d" % sum, file= f)
     print("---------------", file=f)
     end = datetime.datetime.now()
     elapsed_time += (end - start)
@@ -239,33 +245,24 @@ def elastic5_search(db, optype, words, es):
             }
         }
     else:
-        search_words = []
-        for w in words:
-            search_words += [
-                {
-                    "match" : {
-                        COLUMN : w
-                    }
-                }
-            ]
+        tempstr = ""
+        opstr = ""
         if optype == AND:
-            body = {
-                "size": MAX,
-                "query" : {
-                    "bool" : {
-                        "must" : search_words
-                    }
-                }
-            }
+            opstr = "AND"
         elif optype == OR:
-            body = {
-                "size": MAX,
-                "query" : {
-                    "bool" : {
-                        "should" : search_words
-                    }
+            opstr = "OR"
+        tempstr = words[0]
+        for i in range(1, len(words)):
+            tempstr += " %s %s" % (opstr, words[i])
+        body = {
+            "size": MAX,
+            "query" : {
+                "query_string" : {
+                    "default_field" : COLUMN,
+                    "query" : tempstr
                 }
             }
+        }
 
     f=open(db+"-elastic5results.txt", "a")
     start = datetime.datetime.now()
@@ -286,10 +283,11 @@ def elastic5_search(db, optype, words, es):
         for item in all_hits:
             sum += 1
             print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']), file=f)
-        if sum == hits_count:
+        if sum == MAX:
             break
         page = es.scroll(scroll_id = sid, scroll = '2m')
         sid = page['_scroll_id']
+    print("Total items: %d" % hits_count, file= f)
     print("---------------", file=f)
     end = datetime.datetime.now()
     elapsed_time += (end - start)
