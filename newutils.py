@@ -57,7 +57,7 @@ def randomword(n,m):
     w = word_tokens[random.randint(0, len(word_tokens)-1)]
     if (w.isalpha() and len(w) <= m and len(w) >= n and (w.lower() not in STOPWORDS)):
         return w.lower()
-    return randomword(n,m,table,total_num)
+    return randomword(n,m)
 
 def randomphrase(n,m):
     if random.randint(0,1) == 0:
@@ -78,7 +78,7 @@ def randomphrase(n,m):
         if (w2.isalpha() and len(w2) <= m and len(w2) >= n and (w2.lower() not in STOPWORDS)):
             if (w3.isalpha() and len(w3) <= m and len(w3) >= n and (w3.lower() not in STOPWORDS)):
                 return w1.lower()+' '+w2.lower()+' '+w3.lower()
-    return randomphrase(n,m,table,total_num)
+    return randomphrase(n,m)
 
 #--------------------------------------------------------------------------------------------#
 
@@ -113,7 +113,7 @@ def mysql_search(optype, words, mysql_connection):
     mysql_cursor.execute("SELECT %s as score, _id FROM %s WHERE %s ORDER BY score DESC" % (tempstr1, TABLE, tempstr2))
     end = datetime.datetime.now()
     elapsed_time = end - start
-    f=open("nosqlprj-mysqlresults.txt", "w")
+    f=open("nosqlprj-mysqlresults.txt", "a")
     temp_str = ""
     for w in words:
         temp_str += w + " "
@@ -138,7 +138,7 @@ def mssql_search(optype, words, mssql_conn):
     if optype == SINGLE:
         tempstr += words[0]
     elif optype == EXACTPHRASE:
-        temp_str += ('"%s"' % words[0])
+        tempstr += ('"%s"' % words[0])
     elif optype == AND or optype == OR:
         op = None
         if optype == AND:
@@ -153,7 +153,7 @@ def mssql_search(optype, words, mssql_conn):
     mssql_cursor.execute(cmd)
     end = datetime.datetime.now()
     elapsed_time = end - start
-    f=open("nosqlprj-mssqlresults.txt", "w")
+    f=open("nosqlprj-mssqlresults.txt", "a")
     temp_str = ""
     for w in words:
         temp_str += w + " "
@@ -201,7 +201,7 @@ def mongo_search(optype, words, client, clustername):
         end = datetime.datetime.now()
 
     elapsed_time = end - start
-    f=open(clustername+"-mongoresults.txt", "w")
+    f=open(clustername+"-mongoresults.txt", "a")
     temp_str = ""
     for w in words:
         temp_str += w + " "
@@ -267,7 +267,7 @@ def elastic5_search(db, optype, words, es):
                 }
             }
 
-    f=open(db+"-elastic5results.txt", "w")
+    f=open(db+"-elastic5results.txt", "a")
     start = datetime.datetime.now()
     page = es.search(index = db,doc_type = TABLE,scroll = '2m',body=body, request_timeout=60)
     end = datetime.datetime.now()
