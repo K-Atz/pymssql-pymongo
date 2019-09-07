@@ -245,24 +245,33 @@ def elastic5_search(db, optype, words, es):
             }
         }
     else:
-        tempstr = ""
-        opstr = ""
+        search_words = []
+        for w in words:
+            search_words += [
+                {
+                    "match" : {
+                        COLUMN : w
+                    }
+                }
+            ]
         if optype == AND:
-            opstr = "AND"
-        elif optype == OR:
-            opstr = "OR"
-        tempstr = words[0]
-        for i in range(1, len(words)):
-            tempstr += " %s %s" % (opstr, words[i])
-        body = {
-            "size": MAX,
-            "query" : {
-                "query_string" : {
-                    "default_field" : COLUMN,
-                    "query" : tempstr
+            body = {
+                "size": MAX,
+                "query" : {
+                    "bool" : {
+                        "must" : search_words
+                    }
                 }
             }
-        }
+        elif optype == OR:
+            body = {
+                "size": MAX,
+                "query" : {
+                    "bool" : {
+                        "should" : search_words
+                    }
+                }
+            }
 
     f=open(db+"-elastic5results.txt", "a")
     start = datetime.datetime.now()
@@ -283,7 +292,7 @@ def elastic5_search(db, optype, words, es):
         for item in all_hits:
             sum += 1
             print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']), file=f)
-        if sum == MAX:
+        if sum == hits_count:
             break
         page = es.scroll(scroll_id = sid, scroll = '2m')
         sid = page['_scroll_id']

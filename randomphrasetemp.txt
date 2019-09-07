@@ -1,2 +1,2 @@
-output voltage ripple
-available methyl hemiketal
+anomaly detection mechanism
+control allowing choices
