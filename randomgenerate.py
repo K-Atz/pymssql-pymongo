@@ -1,7 +1,7 @@
 from newutils import *
 
 randomandfile=open("randomWordsAND.txt", "w")
-randomorfile=open("randomWordsOR.txt", "w")
+randomorfile=open("randomWordsOR-9-15.txt", "w")
 randompfile=open("randomPhrase.txt", "w")
 for i in range(0,500):
     stri = "%s %s %s" % (randomword(4,9), randomword(4,9), randomword(4,9))
@@ -10,4 +10,4 @@ for i in range(0,500):
     print(stri, file=randomorfile)
     stri = "%s" % randomphrase(4,9)
     print(stri, file=randompfile)
-    print("\r%d rows inserted in both files . . ." % (i+1), end="")
+    print("\r%d rows inserted in three files . . ." % (i+1), end="")

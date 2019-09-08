@@ -1,10 +1,10 @@
 from newutils import *
 
-# es5_client = Elasticsearch5(HOSTIP + ':9205', timeout=120)
+es5_client = Elasticsearch5(HOSTIP + ':9205', timeout=120)
 # es5_client_3shard = Elasticsearch5(HOSTIP + ':9206', timeout=120)
-mongo_client = pymongo.MongoClient('mongodb://%s:27023/' % HOSTIP)
-mongo_client_3sh = pymongo.MongoClient('mongodb://%s:27030/' % HOSTIP)
-mongo_client_6sh = pymongo.MongoClient('mongodb://%s:27032/' % HOSTIP)
+# mongo_client = pymongo.MongoClient('mongodb://%s:27023/' % HOSTIP)
+# mongo_client_3sh = pymongo.MongoClient('mongodb://%s:27030/' % HOSTIP)
+# mongo_client_6sh = pymongo.MongoClient('mongodb://%s:27032/' % HOSTIP)
 # mssql_client = pymssql.connect(server=HOSTIP, user='sa', password='MSSql-pwd', database=DB)
 # mysql_client = mysql.connector.connect(host='localhost', user="root", passwd="password", db=DB)
 
@@ -44,22 +44,26 @@ def runworkload(db, optype, ref, conn):
     mean = sum(times)/len(times)
     return mean*1000
 
-SRC = "randomwords500.txt"
-SRCP = "randomphrase500.txt"
-OPS = [SINGLE, AND, OR ,EXACTPHRASE]
+SRCOR = "./newRandomSeries-500/randomWordsOR.txt"
+SRCP = "./newRandomSeries-500/randomPhrase.txt"
+SRCAND = "./newRandomSeries-500/randomWordsAND.txt"
+OPS = []
+OPS += [SINGLE, AND, OR ,EXACTPHRASE]
 DBS = []
-# OPS = [OR]
 # DBS += [(ELASTIC5, es5_client), (ELASTIC5_3, es5_client_3shard), (ELASTIC5_6, es5_client_3shard)]
 # DBS += [(MSSQL, mssql_client), (MYSQL, mysql_client)]
 # DBS += [(MYSQL, mysql_client)]
-DBS += [(MONGODB, mongo_client), (MONGODB_3, mongo_client_3sh), (MONGODB_6, mongo_client_6sh)]
+# DBS += [(MONGODB, mongo_client), (MONGODB_3, mongo_client_3sh), (MONGODB_6, mongo_client_6sh)]
 # DBS += [(MSSQL, mssql_client)]
+DBS += [(ELASTIC5, es5_client)]
 
-for db in DBS:
-    for op in OPS:
+for op in OPS:
+    for db in DBS:
         if op == EXACTPHRASE:
             src = SRCP
+        elif op == AND:
+            src = SRCAND
         else:
-            src = SRC
+            src = SRCOR
         mean = runworkload(db[0], op, src, db[1])
         print(" | AvgLatency: %f ms" % mean)
