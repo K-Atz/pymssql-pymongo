@@ -196,7 +196,7 @@ def mongo_search(optype, words, client, clustername):
             term += '"%s" ' % words[i]
         term += '"%s"' % words[-1]
         start = datetime.datetime.now()
-        result = mycol.find({"$text": {"$search": ("%s" % term)}},{"score": { "$meta": "textScore" }}).sort([('score', {'$meta': 'textScore'})])
+        result = mycol.find({"$text": {"$search": ("'%s'" % term)}},{"score": { "$meta": "textScore" }}).sort([('score', {'$meta': 'textScore'})])
         end = datetime.datetime.now()
     elif optype == OR:
         term = ""
