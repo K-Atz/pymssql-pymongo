@@ -1,4 +1,3 @@
-- EXACTPHRASE test for mariadb
-- AND test for mongodb
-- EXACTPHRASE test for mongodb
+- EXACTPHRASE test for mariadb gather results
+- check mongo index and then AND test for mongodb gather results
 - remove all caches from wherever you want to test again

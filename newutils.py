@@ -193,8 +193,8 @@ def mongo_search(optype, words, client, clustername):
     elif optype == AND:
         term = ""
         for i in range(0, len(words)-1):
-            term += "\"%s\" " % words[i]
-        term += "\"%s\"" % words[-1]
+            term += '"%s" ' % words[i]
+        term += '"%s"' % words[-1]
         start = datetime.datetime.now()
         result = mycol.find({"$text": {"$search": ("%s" % term)}},{"score": { "$meta": "textScore" }}).sort([('score', {'$meta': 'textScore'})])
         end = datetime.datetime.now()
