@@ -110,7 +110,10 @@ def mysql_search(optype, words, mysql_connection):
     tempstr1 = "MATCH(%s) AGAINST ('%s' IN NATURAL LANGUAGE MODE)" % (COLUMN, tempstr0)
     tempstr2 = "MATCH(%s) AGAINST ('%s' IN BOOLEAN MODE)" % (COLUMN, req)
     start = datetime.datetime.now()
-    mysql_cursor.execute("SELECT %s as score, _id FROM %s WHERE %s ORDER BY score DESC" % (tempstr1, TABLE, tempstr2))
+    if optype == EXACTPHRASE:
+        mysql_cursor.execute("SELECT %s as score, _id FROM %s WHERE %s ORDER BY score DESC" % (tempstr1, TABLE, tempstr1))
+    else:
+        mysql_cursor.execute("SELECT %s as score, _id FROM %s WHERE %s ORDER BY score DESC" % (tempstr1, TABLE, tempstr2))
     end = datetime.datetime.now()
     elapsed_time = end - start
     f=open("nosqlprj-mysqlresults.txt", "a")
