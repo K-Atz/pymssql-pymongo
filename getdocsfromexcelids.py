@@ -13,18 +13,16 @@ def getdoc(ID):
         return str(item)
 
 # Give the location of the file 
-loc = ("./t.xlsx") 
+loc = ("lastSundayResult/fulltextresults.xlsx") 
   
 # To open Workbook 
 wb = xlrd.open_workbook(loc) 
 sheet = wb.sheet_by_index(0) 
 
 for i in range(1, 81):
-    # temp = ""
     for j in range(4, 9):
         cell = sheet.cell_value(i, j)
         if (str(cell) == ""):
-            # temp = "None"
             break
         id = int(float(str(cell)))
         try:
@@ -32,3 +30,16 @@ for i in range(1, 81):
                 print("%s" % getdoc(id), file=f)
         except FileExistsError:
             pass
+
+'''
+for i in range(1, 81):
+    temp = "" 
+    for j in range(4, 9):
+        cell = sheet.cell_value(i, j)
+        if (str(cell) == ""):
+            temp = "None"
+            break
+        id = int(float(str(cell)))
+        temp += "%d " % id
+    print(temp)
+'''

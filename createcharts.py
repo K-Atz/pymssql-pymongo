@@ -2,7 +2,16 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.offline as offline
 from selenium import webdriver
-import os
+import os, xlrd
+
+ES_1 = 1
+ES_3 = 2
+ES_6 = 3
+MONGO_1 = 4
+MONGO_3 = 5
+MONGO_6 = 6
+MSSQL = 7
+MARIA = 8
 
 def save_png(imagepath, imagename, figure, width, height):
     offline.plot(figure, image='svg', auto_open=False,
@@ -26,5 +35,23 @@ def dbscomparefigure(databases, values_names, values, x_title, y_title, chart_ti
     figure.update_layout(barmode='group')
     return figure
 
-fig = dbscomparefigure(['db1', 'db2'], ['a','b'], [[1,2],[4,5]], 'x', 'y', 'charttitle')
-save_png('./temppics/', 'tempimg.png', fig, 1000, 500)
+wb = xlrd.open_workbook("lastSundayResult/summary.xlsx") 
+sheet = wb.sheet_by_index(0) 
+# cell = float(str(sheet.cell_value(i,j)))
+
+databases = []
+single_results = []
+and_results = []
+or_results = []
+phrase_results = []
+for i in [ES_1, MSSQL]:
+    databases += [str(sheet.cell_value(i, 0))]
+    single_results += [float(str(sheet.cell_value(i, 1)))]
+    and_results += [float(str(sheet.cell_value(i, 2)))]
+    or_results += [float(str(sheet.cell_value(i, 3)))]
+    phrase_results += [float(str(sheet.cell_value(i, 4)))]
+values = [single_results, or_results, and_results, phrase_results]
+names = ['Single', 'OR', 'AND', 'Exact Phrase']
+
+fig = dbscomparefigure(databases, names, values, 'Databases', 'Average Latency (ms)', '')
+save_png('./temp/', 'tempimg.png', fig, 1500, 750)
