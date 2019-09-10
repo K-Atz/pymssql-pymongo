@@ -3,3 +3,4 @@
 - remove all caches from wherever you want to test again
 
 - get docs from excel ids and check the correctness
+- get mariadb version
