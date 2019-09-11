@@ -6,3 +6,17 @@ Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
 
 Reading history-file /home/ricest_user/.mysql_history
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+-------
+
+Database changed
+MariaDB [nosqlprj]> SELECT ENGINE
+    -> FROM information_schema.TABLES
+    -> WHERE TABLE_SCHEMA = 'nosqlprj'
+    -> AND TABLE_NAME = 'records'
+    -> ;
++--------+
+| ENGINE |
++--------+
+| MyISAM |
++--------+

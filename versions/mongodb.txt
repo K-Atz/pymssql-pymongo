@@ -1,3 +1,4 @@
 > db.version()
 4.0.9
 
+WiredTiger Storage Engine — MongoDB Manual
