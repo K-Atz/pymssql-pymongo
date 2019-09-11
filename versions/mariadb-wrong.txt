@@ -1,1 +1,8 @@
-mysql  Ver 15.1 Distrib 5.5.60-MariaDB, for Linux (x86_64) using readline 5.1
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 12
+Server version: 10.3.17-MariaDB MariaDB Server
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Reading history-file /home/ricest_user/.mysql_history
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.

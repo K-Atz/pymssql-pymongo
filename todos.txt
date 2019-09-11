@@ -1,6 +1,1 @@
-- EXACTPHRASE test for mariadb gather results
-- check mongo index and then AND test for mongodb gather results
-- remove all caches from wherever you want to test again
-
 - get docs from excel ids and check the correctness
-- get mariadb version
