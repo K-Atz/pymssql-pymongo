@@ -4,15 +4,6 @@ import plotly.offline as offline
 from selenium import webdriver
 import os, xlrd
 
-ES_1 = 1
-ES_3 = 2
-ES_6 = 3
-MONGO_1 = 4
-MONGO_3 = 5
-MONGO_6 = 6
-MSSQL = 7
-MARIA = 8
-
 def save_png(imagepath, imagename, figure, width, height):
     offline.plot(figure, image='svg', auto_open=False,
                  image_width=width, image_height=height)
@@ -29,7 +20,7 @@ def dbscomparefigure(databases, values_names, values, x_title, y_title, chart_ti
         dt += [go.Bar(name=values_names[i], x=databases,
                       y=values[i], text=values[i], textposition='auto')]
     figure = go.Figure(data=dt)
-    figure.update_xaxes(title_text="<b>%s</b>" % x_title)
+    # figure.update_xaxes(title_text="<b>%s</b>" % x_title)
     figure.update_yaxes(title_text="<b>%s</b>" % y_title)
     figure.update_layout(title_text="<b>%s</b>" % chart_title)
     figure.update_layout(barmode='group')
@@ -44,14 +35,26 @@ single_results = []
 and_results = []
 or_results = []
 phrase_results = []
-for i in [ES_1, MSSQL]:
+
+
+ES_1 = 1
+ES_3 = 2
+ES_6 = 3
+MONGO_1 = 4
+MONGO_3 = 5
+MONGO_6 = 6
+MSSQL = 7
+MARIA = 8
+
+for i in [MSSQL, ES_1, ES_3, ES_6]:
     databases += [str(sheet.cell_value(i, 0))]
-    single_results += [float(str(sheet.cell_value(i, 1)))]
-    and_results += [float(str(sheet.cell_value(i, 2)))]
-    or_results += [float(str(sheet.cell_value(i, 3)))]
-    phrase_results += [float(str(sheet.cell_value(i, 4)))]
+    single_results += [round(float(str(sheet.cell_value(i, 1))),1)]
+    and_results += [round(float(str(sheet.cell_value(i, 2))),1)]
+    or_results += [round(float(str(sheet.cell_value(i, 3))),1)]
+    phrase_results += [round(float(str(sheet.cell_value(i, 4))),1)]
 values = [single_results, or_results, and_results, phrase_results]
 names = ['Single', 'OR', 'AND', 'Exact Phrase']
 
-fig = dbscomparefigure(databases, names, values, 'Databases', 'Average Latency (ms)', '')
-save_png('./temp/', 'tempimg.png', fig, 1500, 750)
+fig = dbscomparefigure(databases, names, values, 'Databases', 'Average Latency (ms)', 'Full-Text Search Performance')
+save_png('./phase2charts/', 'mssqlVSes.png', fig, 1500, 750)
+# save_png('./phase2charts/', 'mssqlVSmariadb.png', fig, 1200, 550)
