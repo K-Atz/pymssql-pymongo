@@ -46,6 +46,8 @@ MONGO_6 = 6
 MSSQL = 7
 MARIA = 8
 
+# for i in [MONGO_1, ES_1, MONGO_3, ES_3,MONGO_6,  ES_6]:
+# for i in [MONGO_1, ES_1]:
 for i in [MSSQL, ES_1, ES_3, ES_6]:
     databases += [str(sheet.cell_value(i, 0))]
     single_results += [round(float(str(sheet.cell_value(i, 1))),1)]
@@ -55,6 +57,10 @@ for i in [MSSQL, ES_1, ES_3, ES_6]:
 values = [single_results, or_results, and_results, phrase_results]
 names = ['Single', 'OR', 'AND', 'Exact Phrase']
 
+# values = [and_results]
+# names = ['AND']
+
 fig = dbscomparefigure(databases, names, values, 'Databases', 'Average Latency (ms)', 'Full-Text Search Performance')
-save_png('./phase2charts/', 'mssqlVSes.png', fig, 1500, 750)
+# fig.update_yaxes(range=[0, 5000])
+save_png('./phase2charts/', '24-esVSmssql.png', fig, 1500, 750)
 # save_png('./phase2charts/', 'mssqlVSmariadb.png', fig, 1200, 550)

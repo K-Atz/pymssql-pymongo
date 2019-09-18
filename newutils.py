@@ -43,6 +43,16 @@ def containnumber(word):
 conn = pymssql.connect(server='172.16.8.10\RICESTSQLSERVER', user='sa', password='RICEST@SQLSERVER2008', database='NOSQL_db')  
 random_word_cursor = conn.cursor()
 
+def getdoc(ID):
+    global random_word_cursor
+    cursor = random_word_cursor
+    cursor.execute('SELECT Abstract FROM [NOSQL_db].[dbo].[LangFilterIEEE] WHERE ID = %d' % ID)
+    for item in cursor:
+        return str(item[0])
+    cursor.execute('SELECT Abstract FROM [NOSQL_db].[dbo].[LangFilter] WHERE ID = %d' % ID)
+    for item in cursor:
+        return str(item[0])
+
 def randomword(n,m):
     if random.randint(0,1) == 0:
         table = SOURCE_TABLE
@@ -126,8 +136,9 @@ def mysql_search(optype, words, mysql_connection):
     sum = 0
     for item in mysql_cursor:
         sum += 1
-        if sum <= MAX:
-            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]), file= f)
+        # if sum <= MAX:
+        #     print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]), file= f)
+        print("\n%s\n%s" % (item[1], getdoc(int(item[1]))), file= f) ###temp
     print("Total items: %d" % sum, file= f)
     print("---------------", file= f)
     end = datetime.datetime.now()
@@ -168,8 +179,9 @@ def mssql_search(optype, words, mssql_conn):
     sum = 0
     for item in mssql_cursor:
         sum += 1
-        if sum <= MAX:
-            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]), file = f)
+        # if sum <= MAX:
+        #     print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item[0], sum, item[1]), file = f)
+        print("\n%s\n%s" % (item[1], getdoc(int(item[1]))), file= f) ###temp
     print("Total items: %d" % sum, file= f)
     print("---------------", file = f)
     end = datetime.datetime.now()
@@ -218,8 +230,9 @@ def mongo_search(optype, words, client, clustername):
     sum = 0
     for item in result:
         sum += 1
-        if sum <= MAX:
-            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['score'], sum, item['_id']), file=f)
+        # if sum <= MAX:
+        #     print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['score'], sum, item['_id']), file=f)
+        print("\n%s\n%s" % (item['_id'], getdoc(int(item['_id']))), file= f) ###temp
     print("Total items: %d" % sum, file= f)
     print("---------------", file=f)
     end = datetime.datetime.now()
@@ -295,8 +308,10 @@ def elastic5_search(db, optype, words, es):
         all_hits = page['hits']['hits']
         for item in all_hits:
             sum += 1
-            print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']), file=f)
-        if sum == MAX or sum == hits_count:
+            # print("SCORE: %f | ITEM NUMBER %d | ITEM ID: %s" % (item['_score'], sum, item['_id']), file=f)
+            print("\n%s\n%s" % (item['_id'], getdoc(int(item['_id']))), file= f) ###temp
+        # if sum == MAX or sum == hits_count:
+        if sum == hits_count: ###temp
             break
         page = es.scroll(scroll_id = sid, scroll = '2m')
         sid = page['_scroll_id']
